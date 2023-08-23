@@ -2,7 +2,6 @@ const express = require('express');
 const inquirer = require('inquirer');
 const app = express();
 const mysql = require("mysql2");
-
 // connection to database
 const connection = mysql.createConnection({
     host: 'baseOdata',
@@ -10,7 +9,6 @@ const connection = mysql.createConnection({
     password: 'rootr00t!',
     database: 'schema.sql',
 })
-
 function displayMenu() {
     inquirer
       .prompt ([
@@ -58,7 +56,7 @@ function displayMenu() {
           case "Update an employee's role":
                 // Call a function to delete an employee
             updateRole();
-            break;              
+            break;             
           case 'Exit':
             console.log('Goodbye!');
             connection.end(); // Close the database connection
@@ -70,7 +68,78 @@ function displayMenu() {
         }
       });
   }
-  
-
-
+  function addRole() {
+    inquirer
+        .prompt([
+            {
+                type: 'input',
+                name: 'title',
+                message: 'Enter the title of the role:',
+            },
+            {
+                type: 'input',
+                name: 'salary',
+                message: 'Enter the salary for the role:',
+            },
+            {
+                type: 'input',
+                name: 'department_id',
+                message: 'Enter the department ID for the role:',
+            },
+        ])
+        .then((answers) => {
+            connection.query(
+                'INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)',
+                [answers.title, answers.salary, answers.department_id],
+                (err, results) => {
+                    if (err) throw err;
+                    console.log('Role added successfully!');
+                    displayMenu(); // Return to the main menu
+                }
+            );
+        });
+}
+function viewDepartments() {
+  // SQL query to select all departments
+  const query = 'SELECT * FROM departments';
+  connection.query(query, (err, results) => {
+      if (err) {
+          console.error('Error fetching departments:', err);
+      } else {
+          // Display the list of departments
+          console.log('List of Departments:');
+          results.forEach((department) => {
+              console.log(`ID: ${department.id} | Name: ${department.name}`);
+          });
+      }
+      displayMenu(); // Return to the main menu
+  });
+}
+function viewRoles() {
+  const query = 'SELECT * FROM roles';
+  connection.query(query, (err, results) => {
+    if (err) {
+    console.error('Error fetching roles:', err);
+  }  else {
+      console.log('List of Roles:');
+      results.forEach((role) => {
+        console.log(`${role.title} | ID: ${role.id}`);
+      });
+    }})
+   displayMenu();
+}
+function viewEmployees() {
+  const query = 'SELECT * FROM `employee`';
+  connection.query(query, (err, results) => {
+    if (err) {
+      console.error('Error fetching Employees:', err);
+    } else {
+      console.log('List of Employees:');
+      results.forEach((employee) => {
+        console.log(`ID: ${employee.id} | First Name: ${employee.first_name} | Last Name: ${employee.last_name}`);
+      });
+    }
+    displayMenu();
+  });
+}
 displayMenu();
