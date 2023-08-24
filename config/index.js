@@ -1,4 +1,7 @@
+const { default: inquirer } = require('inquirer');
 const mysql = require('mysql2');
+const connection = require('./connection');
+
 const db = mysql.createConnection({
     host : 'localhost',
     user: 'root',
@@ -178,6 +181,22 @@ inquirer
             }
         );
     });
+
+function addEmployee() {
+inquirer
+    .prompt([
+      {
+        type: 'input',
+        name: 'name',
+        message: 'Enter name of new employee:',
+      },
+    ])
+    .then((answers) => {
+      connection.query(
+        'INSERT INTO `employee` (name)'
+      )
+    })
+}
 
   
 }
